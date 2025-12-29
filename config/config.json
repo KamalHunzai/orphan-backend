@@ -1,0 +1,24 @@
+{
+  "development": {
+    "username": "db-user",
+    "password": "dbuser",
+    "database": "Orphan",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+"test": {
+  "username": "myuser",
+  "password": "Orphan",
+  "database": "orphan",
+  "host": "127.0.0.1",
+  "dialect": "postgres",
+  "port": 5432
+},
+  "production": {
+    "username": "root",
+    "password": "your_production_password",
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}

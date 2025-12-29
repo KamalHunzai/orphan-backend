@@ -1,0 +1,24 @@
+const express = require("express");
+const addReport = require("../controllers/Reportss/addReport");
+const getReportById = require("../controllers/Reportss/getReportById");
+const updateReport = require("../controllers/Reportss/updateReport");
+const deleteReport = require("../controllers/Reportss/deleteReport");
+const getReportsByAdmin = require("../controllers/Reportss/getReportsByAdmin");
+const getReportsByCountry = require("../controllers/Reportss/getReportsByCountry");
+const getUrgentReportsByCountry = require("../controllers/Reportss/getUrgentReportsByCountry");
+const countReportsByTypeAndCountry = require("../controllers/Reportss/countReportsByTypeAndCountry");
+const getCountryWiseTrends = require("../controllers/Reportss/getCountryWiseTrends");
+const getReportsByChildId = require("../controllers/Reportss/getReportsByChildId");
+const router = express.Router();
+
+router.post("/add", addReport);
+router.get("/by-Id/:id", getReportById);
+router.put("/update/:id", updateReport);
+router.delete("/delete/:id", deleteReport);
+router.get("/get-by-admin/:adminId", getReportsByAdmin);
+router.get("/get-by-country", getReportsByCountry);
+router.get("/getUrgentReports", getUrgentReportsByCountry);
+router.get("/count-Reports-ByType", countReportsByTypeAndCountry);
+router.get("/getCountryWiseTrends", getCountryWiseTrends);
+router.get("/getReportsByChildId/:childId", getReportsByChildId);
+module.exports = router;
