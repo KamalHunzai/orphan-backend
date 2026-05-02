@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { VisitReport, admin } = require("../../../models");
+const { VisitReport, Admin } = require("../../../models");
 
 const getVisitReportsByChildId = async (req, res) => {
   const { childId } = req.params;
@@ -16,7 +16,7 @@ const getVisitReportsByChildId = async (req, res) => {
       where: { childId, is_deleted: false }, // soft-delete aware
       include: [
         {
-          model: admin,
+          model: Admin,
           attributes: ["id", "fullName", "email", "profilePicture"],
         },
       ],

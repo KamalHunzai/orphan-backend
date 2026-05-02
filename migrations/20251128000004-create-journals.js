@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("learning_materials", {
+    await queryInterface.createTable("journals", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,39 +13,44 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      description: {
+      journal_text: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
+      emotion_tags: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+      },
+      social_interaction: {
+        type: Sequelize.STRING,
+      },
+      assessment_type: {
+        type: Sequelize.STRING,
+      },
+      notes: {
         type: Sequelize.TEXT,
       },
-      related_tag: {
+      uploaded_file: {
         type: Sequelize.STRING,
       },
-      due_date: {
-        type: Sequelize.DATE,
+      mood_rating: {
+        type: Sequelize.INTEGER,
       },
-      due_time: {
-        type: Sequelize.TIME,
+      activities: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
       },
-      priority: {
-        type: Sequelize.STRING,
-        defaultValue: "normal",
-      },
-      task_type: {
-        type: Sequelize.STRING,
-      },
-      file: {
-        type: Sequelize.STRING,
-      },
-      admin_id: {
+      child_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: "admins",
+          model: "children",
           key: "id",
         },
         onUpdate: "CASCADE",
-        onDelete: "SET NULL",
+        onDelete: "CASCADE",
       },
-      file_type: {
-        type: Sequelize.STRING,
+      is_deleted: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       created_at: {
         allowNull: false,
@@ -57,15 +62,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
-      is_deleted: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
     });
   },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("learning_materials");
+  async down(queryInterface) {
+    await queryInterface.dropTable("journals");
   },
 };

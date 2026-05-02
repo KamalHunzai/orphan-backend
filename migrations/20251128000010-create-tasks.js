@@ -2,22 +2,21 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("notifications", {
+    await queryInterface.createTable("tasks", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      title: {
+      task_title: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      message: {
+      description: {
         type: Sequelize.TEXT,
-        allowNull: false,
       },
-      type: {
+      child_name: {
         type: Sequelize.STRING,
       },
       child_id: {
@@ -38,8 +37,21 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
-      is_read: {
+      due_date: {
+        type: Sequelize.DATE,
+      },
+      due_time: {
+        type: Sequelize.TIME,
+      },
+      priority: {
+        type: Sequelize.STRING,
+      },
+      task_type: {
+        type: Sequelize.STRING,
+      },
+      is_deleted: {
         type: Sequelize.BOOLEAN,
+        allowNull: false,
         defaultValue: false,
       },
       created_at: {
@@ -52,15 +64,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
-      is_deleted: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
     });
   },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("notifications");
+  async down(queryInterface) {
+    await queryInterface.dropTable("tasks");
   },
 };

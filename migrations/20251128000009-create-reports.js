@@ -77,6 +77,7 @@ module.exports = {
       },
       is_deleted: {
         type: Sequelize.BOOLEAN,
+        allowNull: false,
         defaultValue: false,
       },
       created_at: {
@@ -89,15 +90,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
-      is_deleted: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
     });
   },
 
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.dropTable("reports");
   },
 };

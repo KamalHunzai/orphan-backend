@@ -5,31 +5,38 @@ const createJournal = async (req, res) => {
   try {
     const data = {
       ...req.body,
-      moodRating: req.body.moodRating ? parseInt(req.body.moodRating) : null,
+      mood_rating: req.body.moodRating ? parseInt(req.body.moodRating) : null,
     };
 
     let {
-      journalText,
-      childId,
-      moodRating,
-      emotionTags,
-      socialInteraction,
-      assessmentType,
+      journal_text,
+      child_id,
+      mood_rating,
+      emotion_tags,
+      social_interaction,
+      assessment_type,
       notes,
       activities,
-      tittle,
+      title,
     } = data;
 
-    // Normalize arrays
-    if (emotionTags && !Array.isArray(emotionTags)) {
+    // Accept both camelCase (from client) and snake_case
+    journal_text = journal_text || req.body.journalText;
+    child_id = child_id || req.body.childId;
+    emotion_tags = emotion_tags || req.body.emotionTags;
+    social_interaction = social_interaction || req.body.socialInteraction;
+    assessment_type = assessment_type || req.body.assessmentType;
+    title = title || req.body.tittle; // handle legacy typo from old clients
+
+    if (Array.isArray(emotion_tags) === false && emotion_tags) {
       try {
-        emotionTags = JSON.parse(emotionTags);
+        emotion_tags = JSON.parse(emotion_tags);
       } catch {
-        emotionTags = [String(emotionTags).trim()];
+        emotion_tags = [String(emotion_tags).trim()];
       }
     }
 
-    if (activities && !Array.isArray(activities)) {
+    if (Array.isArray(activities) === false && activities) {
       try {
         activities = JSON.parse(activities);
       } catch {
@@ -40,22 +47,19 @@ const createJournal = async (req, res) => {
       }
     }
 
-    console.log("REQ FILE:", req.file);
-
-    // ✅ Save full file URL if uploaded
-    const uploadedFileUrl = req.file ? req.file.location : null;
+    const uploaded_file = req.file ? req.file.location : null;
 
     const newJournal = await Journal.create({
-      journalText,
-      childId,
-      moodRating,
-      emotionTags,
-      socialInteraction,
-      assessmentType,
+      title,
+      journal_text,
+      child_id,
+      mood_rating,
+      emotion_tags,
+      social_interaction,
+      assessment_type,
       notes,
-      uploadedFile: uploadedFileUrl, // ✅ stores full URL
+      uploaded_file,
       activities,
-      tittle,
     });
 
     return res.status(201).json({

@@ -1,22 +1,21 @@
 const { VisitPlanning, Child, Admin } = require("../../../models");
 
-// Get All Visit Planning Records with Child & Admin Info
 const getAllVisitPlanning = async (req, res) => {
   try {
     const visitPlannings = await VisitPlanning.findAll({
-      where: { is_deleted: false }, // Exclude soft-deleted records
+      where: { is_deleted: false },
       order: [
-        ["visitDate", "ASC"],
-        ["visitTime", "ASC"],
+        ["visit_date", "ASC"],
+        ["visit_time", "ASC"],
       ],
       include: [
         {
           model: Child,
-          attributes: ["id", "firstName", "lastName", "location"],
+          attributes: ["id", "first_name", "last_name", "location"],
         },
         {
           model: Admin,
-          attributes: ["id", "fullName", "email"],
+          attributes: ["id", "full_name", "email"],
         },
       ],
     });

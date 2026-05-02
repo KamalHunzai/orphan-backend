@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("managements", {
+    await queryInterface.createTable("admins", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -24,8 +24,23 @@ module.exports = {
       country: {
         type: Sequelize.STRING,
       },
-      role: {
+      employment_type: {
         type: Sequelize.STRING,
+      },
+      years_of_experience: {
+        type: Sequelize.INTEGER,
+      },
+      professional_background: {
+        type: Sequelize.TEXT,
+      },
+      maximum_case_load: {
+        type: Sequelize.INTEGER,
+      },
+      preferred_age_group: {
+        type: Sequelize.STRING,
+      },
+      special_skills: {
+        type: Sequelize.TEXT,
       },
       superadmin_id: {
         type: Sequelize.INTEGER,
@@ -35,6 +50,24 @@ module.exports = {
         },
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      profile_picture: {
+        type: Sequelize.STRING,
+      },
+      otp: {
+        type: Sequelize.INTEGER,
+      },
+      otp_expiry: {
+        type: Sequelize.DATE,
+      },
+      is_deleted: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       created_at: {
         allowNull: false,
@@ -46,15 +79,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
-      is_deleted: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
     });
   },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("managements");
+  async down(queryInterface) {
+    await queryInterface.dropTable("admins");
   },
 };

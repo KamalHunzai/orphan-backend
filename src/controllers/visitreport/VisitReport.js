@@ -12,11 +12,11 @@ const getLatestVisitReportsByChild = async (req, res) => {
 
   try {
     const latestReports = await VisitReport.findAll({
-      where: { childId, is_deleted: false }, // Soft-delete aware
+      where: { child_id: childId, is_deleted: false },
       order: [
-        ["visitDate", "DESC"],
-        ["visitTime", "DESC"],
-      ], // Latest first
+        ["visit_date", "DESC"],
+        ["visit_time", "DESC"],
+      ],
     });
 
     if (!latestReports.length) {

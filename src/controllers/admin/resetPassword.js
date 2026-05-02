@@ -1,4 +1,4 @@
-const { admin } = require("../../../models");
+const { Admin } = require("../../../models");
 const bcrypt = require("bcryptjs");
 
 const resetPassword = async (req, res) => {
@@ -21,7 +21,7 @@ const resetPassword = async (req, res) => {
     }
 
     // Find the admin by email and ensure not soft-deleted
-    const user = await admin.findOne({
+    const user = await Admin.findOne({
       where: {
         email,
         is_deleted: false, // ✅ respect soft delete

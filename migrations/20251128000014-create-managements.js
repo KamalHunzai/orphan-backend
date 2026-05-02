@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("super_admins", {
+    await queryInterface.createTable("managements", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -18,18 +18,28 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      password: {
+      phone_number: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
-      county: {
+      country: {
         type: Sequelize.STRING,
       },
       role: {
         type: Sequelize.STRING,
       },
-      number: {
-        type: Sequelize.STRING,
+      superadmin_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "admins",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
+      is_deleted: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       created_at: {
         allowNull: false,
@@ -41,15 +51,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
-      is_deleted: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
     });
   },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("super_admins");
+  async down(queryInterface) {
+    await queryInterface.dropTable("managements");
   },
 };

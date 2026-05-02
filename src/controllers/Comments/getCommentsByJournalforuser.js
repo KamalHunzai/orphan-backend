@@ -6,7 +6,6 @@ const getCommentsByJournalforuser = async (req, res) => {
     const { journalId } = req.params;
     const journalPk = Number(journalId);
 
-    // Validate journal ID
     if (!journalId || isNaN(journalPk)) {
       return res.status(400).json({
         success: false,
@@ -14,9 +13,8 @@ const getCommentsByJournalforuser = async (req, res) => {
       });
     }
 
-    // Optional: Make sure journal itself isn't soft-deleted (since you said ALL models have soft delete)
     const journalExists = await Journal.findOne({
-      where: { id: journalPk, deleted: false },
+      where: { id: journalPk, is_deleted: false },
     });
     if (!journalExists) {
       return res.status(404).json({
@@ -27,23 +25,23 @@ const getCommentsByJournalforuser = async (req, res) => {
 
     const comments = await Comment.findAll({
       where: {
-        journalId: journalPk,
+        journal_id: journalPk,
         visible: true,
-        deleted: false, // ✅ enforce soft delete
+        is_deleted: false,
       },
       include: [
         {
           model: Journal,
           as: "journal",
-          attributes: ["id", "journalText", "moodRating"],
+          attributes: ["id", "journal_text", "mood_rating"],
         },
         {
           model: Admin,
           as: "admin",
-          attributes: ["id", "fullName", "profilePicture"],
+          attributes: ["id", "full_name", "profile_picture"],
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["created_at", "DESC"]],
     });
 
     return res.status(200).json({

@@ -88,10 +88,6 @@ module.exports = (sequelize, DataTypes) => {
       is_deleted: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
-      },
-      is_deleted: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
         allowNull: false,
       },
     },

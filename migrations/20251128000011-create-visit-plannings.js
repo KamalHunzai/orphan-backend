@@ -2,41 +2,47 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("comments", {
+    await queryInterface.createTable("visit_plannings", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      child_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "children",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
       admin_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         references: {
           model: "admins",
           key: "id",
         },
         onUpdate: "CASCADE",
-        onDelete: "CASCADE",
+        onDelete: "SET NULL",
       },
-      journal_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: "journals",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
+      visit_date: {
+        type: Sequelize.DATE,
       },
-      text: {
-        type: Sequelize.TEXT,
-        allowNull: false,
+      visit_time: {
+        type: Sequelize.TIME,
       },
-      visible: {
+      visit_type: {
+        type: Sequelize.STRING,
+      },
+      notes: {
+        type: Sequelize.STRING,
+      },
+      is_deleted: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: true,
+        defaultValue: false,
       },
       created_at: {
         allowNull: false,
@@ -48,15 +54,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
-      is_deleted: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
     });
   },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("comments");
+  async down(queryInterface) {
+    await queryInterface.dropTable("visit_plannings");
   },
 };

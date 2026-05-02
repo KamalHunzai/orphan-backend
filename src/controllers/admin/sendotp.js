@@ -1,4 +1,4 @@
-const { admin } = require("../../../models");
+const { Admin } = require("../../../models");
 const sgMail = require("@sendgrid/mail");
 const crypto = require("crypto");
 require("dotenv").config();
@@ -20,7 +20,7 @@ const sendOtp = async (req, res) => {
     }
 
     // ✅ Find user and exclude soft-deleted
-    const user = await admin.findOne({
+    const user = await Admin.findOne({
       where: {
         email,
         is_deleted: false, // ✅ soft delete check

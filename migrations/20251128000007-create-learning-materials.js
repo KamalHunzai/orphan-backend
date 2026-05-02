@@ -2,31 +2,38 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("tasks", {
+    await queryInterface.createTable("learning_materials", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      task_title: {
+      title: {
         type: Sequelize.STRING,
         allowNull: false,
       },
       description: {
         type: Sequelize.TEXT,
       },
-      child_name: {
+      related_tag: {
         type: Sequelize.STRING,
       },
-      child_id: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "children",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
+      due_date: {
+        type: Sequelize.DATE,
+      },
+      due_time: {
+        type: Sequelize.TIME,
+      },
+      priority: {
+        type: Sequelize.STRING,
+        defaultValue: "normal",
+      },
+      task_type: {
+        type: Sequelize.STRING,
+      },
+      file: {
+        type: Sequelize.STRING,
       },
       admin_id: {
         type: Sequelize.INTEGER,
@@ -37,17 +44,13 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
-      due_date: {
-        type: Sequelize.DATE,
-      },
-      due_time: {
-        type: Sequelize.TIME,
-      },
-      priority: {
+      file_type: {
         type: Sequelize.STRING,
       },
-      task_type: {
-        type: Sequelize.STRING,
+      is_deleted: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       created_at: {
         allowNull: false,
@@ -59,15 +62,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
-      is_deleted: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
     });
   },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("tasks");
+  async down(queryInterface) {
+    await queryInterface.dropTable("learning_materials");
   },
 };

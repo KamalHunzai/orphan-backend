@@ -7,35 +7,25 @@ const getVisitStatistics = async (req, res) => {
 
     const visitStats = await VisitPlanning.findAll({
       attributes: [
-        [Sequelize.fn("MONTH", Sequelize.col("visitDate")), "month"],
+        [Sequelize.fn("date_part", "month", Sequelize.col("visit_date")), "month"],
         [Sequelize.fn("COUNT", Sequelize.col("id")), "count"],
       ],
       where: Sequelize.where(
-        Sequelize.fn("YEAR", Sequelize.col("visitDate")),
+        Sequelize.fn("date_part", "year", Sequelize.col("visit_date")),
         currentYear
       ),
-      group: [Sequelize.fn("MONTH", Sequelize.col("visitDate"))],
-      order: [[Sequelize.fn("MONTH", Sequelize.col("visitDate")), "ASC"]],
+      group: [Sequelize.fn("date_part", "month", Sequelize.col("visit_date"))],
+      order: [[Sequelize.fn("date_part", "month", Sequelize.col("visit_date")), "ASC"]],
       raw: true,
     });
 
     const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December",
     ];
 
     const formattedStats = monthNames.map((month, index) => {
-      const monthData = visitStats.find((stat) => stat.month === index + 1);
+      const monthData = visitStats.find((stat) => parseInt(stat.month) === index + 1);
       return {
         month,
         count: monthData ? parseInt(monthData.count, 10) : 0,

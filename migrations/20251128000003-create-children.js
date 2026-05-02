@@ -2,47 +2,70 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("admins", {
+    await queryInterface.createTable("children", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      full_name: {
+      first_name: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      last_name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      age: {
+        type: Sequelize.INTEGER,
+      },
+      gender: {
+        type: Sequelize.STRING,
+      },
+      location: {
+        type: Sequelize.STRING,
+      },
+      language: {
+        type: Sequelize.STRING,
+      },
+      guardian_name: {
+        type: Sequelize.STRING,
+      },
+      relationship: {
+        type: Sequelize.STRING,
+      },
+      contact_number: {
+        type: Sequelize.STRING,
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
       },
-      phone_number: {
-        type: Sequelize.STRING,
-      },
-      country: {
-        type: Sequelize.STRING,
-      },
-      employment_type: {
-        type: Sequelize.STRING,
-      },
-      years_of_experience: {
-        type: Sequelize.INTEGER,
-      },
-      professional_background: {
+      general_condition: {
         type: Sequelize.TEXT,
       },
-      maximum_case_load: {
-        type: Sequelize.INTEGER,
-      },
-      preferred_age_group: {
+      current_education_level: {
         type: Sequelize.STRING,
       },
-      special_skills: {
+      school_performance: {
         type: Sequelize.TEXT,
       },
-      superadmin_id: {
+      psychological_support_needs: {
+        type: Sequelize.TEXT,
+      },
+      financial_situation: {
+        type: Sequelize.TEXT,
+      },
+      additional_notes: {
+        type: Sequelize.TEXT,
+      },
+      profile_picture: {
+        type: Sequelize.STRING,
+      },
+      password: {
+        type: Sequelize.STRING,
+      },
+      admin_id: {
         type: Sequelize.INTEGER,
         references: {
           model: "admins",
@@ -51,11 +74,7 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      profile_picture: {
+      upload: {
         type: Sequelize.STRING,
       },
       otp: {
@@ -63,6 +82,11 @@ module.exports = {
       },
       otp_expiry: {
         type: Sequelize.DATE,
+      },
+      is_deleted: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       created_at: {
         allowNull: false,
@@ -74,15 +98,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
-      is_deleted: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
     });
   },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("admins");
+  async down(queryInterface) {
+    await queryInterface.dropTable("children");
   },
 };

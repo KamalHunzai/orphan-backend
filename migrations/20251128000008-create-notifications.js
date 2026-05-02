@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("journals", {
+    await queryInterface.createTable("notifications", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,30 +13,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      journal_text: {
+      message: {
         type: Sequelize.TEXT,
         allowNull: false,
       },
-      emotion_tags: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
-      },
-      social_interaction: {
+      type: {
         type: Sequelize.STRING,
-      },
-      assessment_type: {
-        type: Sequelize.STRING,
-      },
-      notes: {
-        type: Sequelize.TEXT,
-      },
-      uploaded_file: {
-        type: Sequelize.STRING,
-      },
-      mood_rating: {
-        type: Sequelize.INTEGER,
-      },
-      activities: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       child_id: {
         type: Sequelize.INTEGER,
@@ -46,6 +28,24 @@ module.exports = {
         },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
+      },
+      admin_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "admins",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
+      is_read: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      is_deleted: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       created_at: {
         allowNull: false,
@@ -57,15 +57,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal("NOW()"),
       },
-      is_deleted: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
     });
   },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("journals");
+  async down(queryInterface) {
+    await queryInterface.dropTable("notifications");
   },
 };

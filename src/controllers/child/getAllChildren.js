@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Child, admin } = require("../../../models");
+const { Child, Admin } = require("../../../models");
 
 const getAllChildren = async (req, res) => {
   try {
@@ -24,7 +24,7 @@ const getAllChildren = async (req, res) => {
     const includeClause = [];
     if (country) {
       includeClause.push({
-        model: admin,
+        model: Admin,
         as: "Admin",
         attributes: [],
         where: { country },

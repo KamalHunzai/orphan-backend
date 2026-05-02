@@ -19,9 +19,11 @@ module.exports = (sequelize, DataTypes) => {
         as: "recent_reports",
       });
 
-      Admin.hasMany(models.Activity, { foreignKey: "admin_id" });
-      Admin.hasMany(models.LearningMaterial, { foreignKey: "admin_id" });
-      Admin.hasMany(models.Notification, { foreignKey: "admin_id" });
+      Admin.hasMany(models.Activity, { foreignKey: "admin_id", as: "activities" });
+      Admin.hasMany(models.LearningMaterial, { foreignKey: "admin_id", as: "learning_materials" });
+      Admin.hasMany(models.Notification, { foreignKey: "admin_id", as: "notifications" });
+      Admin.hasMany(models.Task, { foreignKey: "admin_id", as: "tasks" });
+      Admin.hasMany(models.VisitPlanning, { foreignKey: "admin_id", as: "visit_plannings" });
 
       Admin.hasMany(models.Comment, {
         foreignKey: "admin_id",

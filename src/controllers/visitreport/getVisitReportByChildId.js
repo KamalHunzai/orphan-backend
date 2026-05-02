@@ -1,4 +1,4 @@
-const { VisitReport, admin } = require("../../../models");
+const { VisitReport, Admin } = require("../../../models");
 
 const getVisitReportsByChildId = async (req, res) => {
   const { childId } = req.params;
@@ -15,7 +15,7 @@ const getVisitReportsByChildId = async (req, res) => {
       where: { child_id: childId, is_deleted: false }, // ✅ DB is snake_case
       include: [
         {
-          model: admin,
+          model: Admin,
           attributes: ["id", "full_name", "email", "profile_picture"], // ✅ snake_case DB fields
         },
       ],

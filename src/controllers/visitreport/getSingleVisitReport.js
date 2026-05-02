@@ -1,4 +1,4 @@
-const { VisitReport, Child, admin } = require("../../../models");
+const { VisitReport, Child, Admin } = require("../../../models");
 
 const getVisitReportById = async (req, res) => {
   try {
@@ -13,7 +13,7 @@ const getVisitReportById = async (req, res) => {
           attributes: ["id", "firstName", "profilePicture"],
         },
         {
-          model: admin,
+          model: Admin,
           attributes: ["id", "fullName", "profilePicture"],
         },
       ],

@@ -5,10 +5,10 @@ const getVisitPlanningByChildId = async (req, res) => {
     const { childId } = req.params;
 
     const visitPlannings = await VisitPlanning.findAll({
-      where: { childId, is_deleted: false },
+      where: { child_id: childId, is_deleted: false },
       order: [
-        ["visitDate", "ASC"],
-        ["visitTime", "ASC"],
+        ["visit_date", "ASC"],
+        ["visit_time", "ASC"],
       ],
     });
 
@@ -20,13 +20,11 @@ const getVisitPlanningByChildId = async (req, res) => {
 
     return res.status(200).json({ success: true, data: visitPlannings });
   } catch (err) {
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Internal Server Error",
-        error: err.message,
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message,
+    });
   }
 };
 

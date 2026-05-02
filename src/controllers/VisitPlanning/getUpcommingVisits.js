@@ -1,7 +1,6 @@
 const { Op } = require("sequelize");
 const { VisitPlanning, Admin } = require("../../../models");
 
-// Get Upcoming Visit Planning Records
 const getUpcomingVisits = async (req, res) => {
   try {
     const currentDate = new Date();
@@ -9,25 +8,25 @@ const getUpcomingVisits = async (req, res) => {
 
     const visitPlannings = await VisitPlanning.findAll({
       where: {
-        is_deleted: false, // Exclude soft-deleted visits
+        is_deleted: false,
         [Op.or]: [
           {
-            visitDate: { [Op.gt]: currentDate }, // Future dates
+            visit_date: { [Op.gt]: currentDate },
           },
           {
-            visitDate: { [Op.eq]: currentDate }, // Same day
-            visitTime: { [Op.gt]: currentTime }, // Future times
+            visit_date: { [Op.eq]: currentDate },
+            visit_time: { [Op.gt]: currentTime },
           },
         ],
       },
       order: [
-        ["visitDate", "ASC"],
-        ["visitTime", "ASC"],
+        ["visit_date", "ASC"],
+        ["visit_time", "ASC"],
       ],
       include: [
         {
           model: Admin,
-          attributes: ["id", "fullName", "email"], // Include admin info
+          attributes: ["id", "full_name", "email"],
         },
       ],
     });

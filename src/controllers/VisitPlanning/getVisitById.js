@@ -5,12 +5,12 @@ const getVisitPlanningById = async (req, res) => {
     const { id } = req.params;
 
     const visitPlanning = await VisitPlanning.findOne({
-      where: { id, is_deleted: false }, // Exclude soft-deleted records
+      where: { id, is_deleted: false },
       include: [
         {
           model: Child,
-          as: "Child", // Ensure this matches your association alias
-          attributes: ["fullName"], // Only fetch child's fullName
+          as: "child",
+          attributes: ["id", "first_name", "last_name"],
         },
       ],
     });

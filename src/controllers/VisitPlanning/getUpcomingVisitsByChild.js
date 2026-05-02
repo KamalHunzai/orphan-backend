@@ -9,21 +9,20 @@ const getUpcomingVisitsByChild = async (req, res) => {
       return res.status(400).json({ message: "Child ID is required." });
     }
 
-    // Fetch upcoming visit planning records
     const upcomingVisits = await VisitPlanning.findAll({
       where: {
-        childId,
-        visitDate: { [Op.gt]: new Date() }, // Only future visits
-        is_deleted: false, // Exclude soft-deleted visits
+        child_id: childId,
+        visit_date: { [Op.gt]: new Date() },
+        is_deleted: false,
       },
       order: [
-        ["visitDate", "ASC"],
-        ["visitTime", "ASC"],
+        ["visit_date", "ASC"],
+        ["visit_time", "ASC"],
       ],
       include: [
         {
           model: Admin,
-          attributes: ["id", "fullName", "email"], // Admin info
+          attributes: ["id", "full_name", "email"],
         },
       ],
     });

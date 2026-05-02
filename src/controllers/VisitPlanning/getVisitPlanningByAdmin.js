@@ -12,22 +12,22 @@ const getVisitPlanningByAdmin = async (req, res) => {
     }
 
     const visitPlannings = await VisitPlanning.findAll({
-      where: { adminId, is_deleted: false }, // Exclude soft-deleted records
+      where: { admin_id: adminId, is_deleted: false },
       include: [
         {
           model: Child,
-          as: "Child", // Must match association alias
-          attributes: ["id", "fullName", "location"],
+          as: "child",
+          attributes: ["id", "first_name", "last_name", "location"],
         },
         {
           model: Admin,
-          as: "Admin", // Must match association alias
-          attributes: ["id", "fullName", "email"],
+          as: "admin",
+          attributes: ["id", "full_name", "email"],
         },
       ],
       order: [
-        ["visitDate", "ASC"],
-        ["visitTime", "ASC"],
+        ["visit_date", "ASC"],
+        ["visit_time", "ASC"],
       ],
     });
 

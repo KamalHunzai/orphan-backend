@@ -29,7 +29,6 @@ const resetPassword = require("../controllers/child/resetPassword");
 
 // Upload middleware (multer-S3 instance)
 const upload = require("../middlewares/Upload");
-const { route } = require("./adminRoutes");
 
 // ------------------- ROUTES -------------------
 

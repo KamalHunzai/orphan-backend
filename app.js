@@ -14,11 +14,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(morgan("dev"));
 
+const swaggerUi = require("swagger-ui-express");
+const swaggerDefinition = require("./src/swagger/swagger");
+
 const adminRoutes = require("./src/routes/adminRoutes");
 const childRoutes = require("./src/routes/childRoutes");
 const taskRoutes = require("./src/routes/taskRoutes");
 const visitReportRoutes = require("./src/routes/visitReportRoutes");
-const visitPlanningtRoutes = require("./src/routes/visitPlanningRoutes");
+const visitPlanningRoutes = require("./src/routes/visitPlanningRoutes");
 const announcementRoutes = require("./src/routes/announcementRoutes");
 const ActivityRoutes = require("./src/routes/ActivityRoutes");
 const journalRoutes = require("./src/routes/journalRoutes");
@@ -28,11 +31,13 @@ const reportsRoutes = require("./src/routes/reportsRoutes");
 const managementRoutes = require("./src/routes/managementRoutes");
 const commentRoutes = require("./src/routes/commentRoutes");
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
+
 app.use("/admin", adminRoutes);
 app.use("/child", childRoutes);
 app.use("/tasks", taskRoutes);
 app.use("/visitReports", visitReportRoutes);
-app.use("/visitPlannings", visitPlanningtRoutes);
+app.use("/visitPlannings", visitPlanningRoutes);
 app.use("/announcements", announcementRoutes);
 app.use("/activity", ActivityRoutes);
 app.use("/journal", journalRoutes);

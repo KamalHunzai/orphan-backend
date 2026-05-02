@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models");
+const { Admin } = require("../../models");
 
 const authenticateUser = async (req, res, next) => {
   try {
@@ -22,7 +22,7 @@ const authenticateUser = async (req, res, next) => {
     req.user = { id: decoded.user.id };
 
     // Fetch the user's role from the database
-    const user = await User.findByPk(req.user.id, { attributes: ["role"] });
+    const user = await Admin.findByPk(req.user.id, { attributes: ["role"] });
 
     if (!user) {
       return res.status(404).send({ message: "User not found" });

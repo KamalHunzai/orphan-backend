@@ -7,7 +7,7 @@ const deleteComment = async (req, res) => {
 
     // Find comment that is NOT already soft deleted
     const comment = await Comment.findOne({
-      where: { id: Number(id), deleted: false },
+      where: { id: Number(id), is_deleted: false },
     });
 
     if (!comment) {
@@ -18,7 +18,7 @@ const deleteComment = async (req, res) => {
     }
 
     // Soft delete
-    await comment.update({ deleted: true });
+    await comment.update({ is_deleted: true });
 
     return res.status(200).json({
       success: true,
