@@ -10,11 +10,11 @@ const getVisitReportById = async (req, res) => {
         {
           model: Child,
           as: "child",
-          attributes: ["id", "firstName", "profilePicture"],
+          attributes: ["id", "first_name", "profile_picture"],
         },
         {
           model: Admin,
-          attributes: ["id", "fullName", "profilePicture"],
+          attributes: ["id", "full_name", "profile_picture"],
         },
       ],
     });

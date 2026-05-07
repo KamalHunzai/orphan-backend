@@ -12,7 +12,7 @@ const getAgeGroupDistribution = async (req, res) => {
       "15-20 years": 0,
     };
 
-    const whereClause = { age: { [Op.not]: null } };
+    const whereClause = { age: { [Op.not]: null }, is_deleted: false };
     if (country) whereClause.location = country;
 
     const children = await Child.findAll({

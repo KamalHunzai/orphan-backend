@@ -11,8 +11,7 @@ const verifyOtp = async (req, res) => {
   }
 
   try {
-    // Find the child by email
-    const child = await Child.findOne({ where: { email } });
+    const child = await Child.findOne({ where: { email, is_deleted: false } });
 
     if (!child) {
       return res.status(404).json({
@@ -30,7 +29,7 @@ const verifyOtp = async (req, res) => {
     }
 
     // Check if OTP is expired
-    if (!child.otpExpiry || new Date() > new Date(child.otpExpiry)) {
+    if (!child.otp_expiry || new Date() > new Date(child.otp_expiry)) {
       return res.status(400).json({
         success: false,
         message: "OTP has expired.",

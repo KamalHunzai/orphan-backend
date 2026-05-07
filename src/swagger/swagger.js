@@ -5,7 +5,14 @@ const swaggerDefinition = {
   info: {
     title: "Orphan Care API",
     version: "1.0.0",
-    description: "REST API for the Orphan Care Management System",
+    description:
+      "REST API for the Orphan Care Management System.\n\n" +
+      "**Authentication:** All protected endpoints require an `accessToken` header containing the JWT returned at login.\n\n" +
+      "**Roles:**\n" +
+      "- `superadmin` — platform owner; manages admins, views global dashboards\n" +
+      "- `admin` — social worker / mentor; manages children, tasks, journals, reports, activities, visit plans\n" +
+      "- `child` — can log in, view their own data, receive notifications\n\n" +
+      "Public endpoints (login, signup, OTP flows) require no token.",
   },
   servers: [
     {
@@ -15,12 +22,14 @@ const swaggerDefinition = {
       },
     },
   ],
+  security: [{ bearerAuth: [] }],
   components: {
     securitySchemes: {
       bearerAuth: {
         type: "apiKey",
         in: "header",
         name: "accessToken",
+        description: "JWT token returned from login. Pass as header: accessToken: <token>",
       },
     },
     schemas: {
@@ -71,6 +80,7 @@ const swaggerDefinition = {
           preferred_age_group: { type: "string" },
           special_skills: { type: "string" },
           profile_picture: { type: "string" },
+          role: { type: "string", example: "admin", description: "Role of the admin — always 'admin'" },
           superadmin_id: { type: "integer" },
           is_deleted: { type: "boolean" },
           created_at: { type: "string", format: "date-time" },
@@ -318,6 +328,7 @@ const swaggerDefinition = {
       post: {
         tags: ["SuperAdmin"],
         summary: "Create a new SuperAdmin",
+        security: [],
         requestBody: {
           required: true,
           content: {
@@ -346,7 +357,8 @@ const swaggerDefinition = {
     "/superadmin/signin": {
       post: {
         tags: ["SuperAdmin"],
-        summary: "SuperAdmin login",
+        summary: "SuperAdmin login — returns JWT with role: superadmin",
+        security: [],
         requestBody: {
           required: true,
           content: {
@@ -363,7 +375,7 @@ const swaggerDefinition = {
           },
         },
         responses: {
-          200: { description: "Login successful — returns JWT token" },
+          200: { description: "Login successful — returns token and superAdmin object" },
           401: { description: "Invalid credentials" },
         },
       },
@@ -371,7 +383,7 @@ const swaggerDefinition = {
     "/superadmin/update/{id}": {
       put: {
         tags: ["SuperAdmin"],
-        summary: "Update SuperAdmin",
+        summary: "Update SuperAdmin [superadmin]",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
         requestBody: {
           content: {
@@ -390,6 +402,8 @@ const swaggerDefinition = {
         },
         responses: {
           200: { description: "Updated successfully" },
+          401: { description: "No token provided" },
+          403: { description: "SuperAdmin access required" },
           404: { description: "SuperAdmin not found" },
         },
       },
@@ -397,10 +411,12 @@ const swaggerDefinition = {
     "/superadmin/getbyid/{id}": {
       get: {
         tags: ["SuperAdmin"],
-        summary: "Get SuperAdmin by ID",
+        summary: "Get SuperAdmin by ID [superadmin]",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
         responses: {
           200: { description: "SuperAdmin object", content: { "application/json": { schema: { $ref: "#/components/schemas/SuperAdmin" } } } },
+          401: { description: "No token provided" },
+          403: { description: "SuperAdmin access required" },
           404: { description: "Not found" },
         },
       },
@@ -408,29 +424,35 @@ const swaggerDefinition = {
     "/superadmin/getDashboardCounts": {
       get: {
         tags: ["SuperAdmin"],
-        summary: "Get dashboard counts by country",
+        summary: "Get dashboard counts by country [superadmin]",
         parameters: [{ name: "country", in: "query", required: true, schema: { type: "string" } }],
         responses: {
           200: { description: "Dashboard counts — totalOrphans, pendingReports, upcomingSchedule, urgentCases" },
+          401: { description: "No token provided" },
+          403: { description: "SuperAdmin access required" },
         },
       },
     },
     "/superadmin/getAdminsAndManagers": {
       get: {
         tags: ["SuperAdmin"],
-        summary: "Get all admins and managers",
+        summary: "Get all admins and managers [superadmin]",
         responses: {
           200: { description: "List of admins and managers" },
+          401: { description: "No token provided" },
+          403: { description: "SuperAdmin access required" },
         },
       },
     },
     "/superadmin/delete/{id}": {
       delete: {
         tags: ["SuperAdmin"],
-        summary: "Soft-delete a SuperAdmin",
+        summary: "Soft-delete a SuperAdmin [superadmin]",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
         responses: {
           200: { description: "Deleted successfully" },
+          401: { description: "No token provided" },
+          403: { description: "SuperAdmin access required" },
           404: { description: "Not found" },
         },
       },
@@ -443,6 +465,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Admin"],
         summary: "Register a new admin",
+        security: [],
         requestBody: {
           required: true,
           content: {
@@ -476,7 +499,8 @@ const swaggerDefinition = {
     "/admin/signin": {
       post: {
         tags: ["Admin"],
-        summary: "Admin login",
+        summary: "Admin login — returns JWT with role: admin",
+        security: [],
         requestBody: {
           required: true,
           content: {
@@ -498,137 +522,11 @@ const swaggerDefinition = {
         },
       },
     },
-    "/admin/update/{id}": {
-      put: {
-        tags: ["Admin"],
-        summary: "Update admin with optional profile picture upload",
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        requestBody: {
-          content: {
-            "multipart/form-data": {
-              schema: {
-                type: "object",
-                properties: {
-                  full_name: { type: "string" },
-                  email: { type: "string" },
-                  currentPassword: { type: "string" },
-                  newPassword: { type: "string" },
-                  phone_number: { type: "string" },
-                  country: { type: "string" },
-                  professional_background: { type: "string" },
-                  profilePicture: { type: "string", format: "binary" },
-                },
-              },
-            },
-          },
-        },
-        responses: {
-          200: { description: "Updated successfully" },
-          404: { description: "Admin not found" },
-        },
-      },
-    },
-    "/admin/updateAdmin/{id}": {
-      put: {
-        tags: ["Admin"],
-        summary: "Update admin profile without file",
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        requestBody: {
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  full_name: { type: "string" },
-                  email: { type: "string" },
-                  currentPassword: { type: "string" },
-                  newPassword: { type: "string" },
-                },
-              },
-            },
-          },
-        },
-        responses: {
-          200: { description: "Updated successfully" },
-          404: { description: "Admin not found" },
-        },
-      },
-    },
-    "/admin/getbyid/{id}": {
-      get: {
-        tags: ["Admin"],
-        summary: "Get admin by ID",
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: {
-          200: { description: "Admin object", content: { "application/json": { schema: { $ref: "#/components/schemas/Admin" } } } },
-          404: { description: "Not found" },
-        },
-      },
-    },
-    "/admin/get-by-id/{id}": {
-      get: {
-        tags: ["Admin"],
-        summary: "Get admin with children and reports (SuperAdmin view)",
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: {
-          200: { description: "Admin with assigned_children, recent_reports, recent_schedules" },
-          404: { description: "Not found" },
-        },
-      },
-    },
-    "/admin/getDashboardStats/{adminId}": {
-      get: {
-        tags: ["Admin"],
-        summary: "Get admin dashboard stats",
-        parameters: [{ name: "adminId", in: "path", required: true, schema: { type: "integer" } }],
-        responses: {
-          200: { description: "activeChildren, reportsThisMonth, upcomingVisits, learningMaterials" },
-        },
-      },
-    },
-    "/admin/get-MentorsBy-Country": {
-      get: {
-        tags: ["Admin"],
-        summary: "Get mentors and child counts by country",
-        parameters: [{ name: "country", in: "query", required: true, schema: { type: "string" } }],
-        responses: {
-          200: { description: "totalMentors, totalChildren, mentors array" },
-        },
-      },
-    },
-    "/admin/get-by-country": {
-      get: {
-        tags: ["Admin"],
-        summary: "Get admins filtered by country",
-        parameters: [{ name: "country", in: "query", required: false, schema: { type: "string" } }],
-        responses: {
-          200: { description: "List of admins" },
-        },
-      },
-    },
-    "/admin/get-Mentor-Activity-count/{country}": {
-      get: {
-        tags: ["Admin"],
-        summary: "Get monthly activity counts for mentors in a country",
-        parameters: [{ name: "country", in: "path", required: true, schema: { type: "string" } }],
-        responses: {
-          200: { description: "Array of { month, activity_count }" },
-        },
-      },
-    },
-    "/admin/getAllNotifications": {
-      get: {
-        tags: ["Admin"],
-        summary: "Get all notifications",
-        responses: {
-          200: { description: "List of notifications" },
-        },
-      },
-    },
     "/admin/sendOtp": {
       post: {
         tags: ["Admin"],
         summary: "Send OTP to admin email for password reset",
+        security: [],
         requestBody: {
           required: true,
           content: {
@@ -651,6 +549,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Admin"],
         summary: "Verify OTP for admin",
+        security: [],
         requestBody: {
           required: true,
           content: {
@@ -676,6 +575,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Admin"],
         summary: "Reset admin password",
+        security: [],
         requestBody: {
           required: true,
           content: {
@@ -697,13 +597,158 @@ const swaggerDefinition = {
         },
       },
     },
+    "/admin/update/{id}": {
+      put: {
+        tags: ["Admin"],
+        summary: "Update admin with optional profile picture upload [admin]",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
+        requestBody: {
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  full_name: { type: "string" },
+                  email: { type: "string" },
+                  currentPassword: { type: "string" },
+                  newPassword: { type: "string" },
+                  phone_number: { type: "string" },
+                  country: { type: "string" },
+                  professional_background: { type: "string" },
+                  profilePicture: { type: "string", format: "binary" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Updated successfully" },
+          401: { description: "No token provided" },
+          403: { description: "Admin access required" },
+          404: { description: "Admin not found" },
+        },
+      },
+    },
+    "/admin/updateAdmin/{id}": {
+      put: {
+        tags: ["Admin"],
+        summary: "Update admin profile without file [admin]",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
+        requestBody: {
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  full_name: { type: "string" },
+                  email: { type: "string" },
+                  currentPassword: { type: "string" },
+                  newPassword: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Updated successfully" },
+          404: { description: "Admin not found" },
+        },
+      },
+    },
+    "/admin/getbyid/{id}": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get admin by ID [admin]",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
+        responses: {
+          200: { description: "Admin object", content: { "application/json": { schema: { $ref: "#/components/schemas/Admin" } } } },
+          401: { description: "No token provided" },
+          403: { description: "Admin access required" },
+          404: { description: "Not found" },
+        },
+      },
+    },
+    "/admin/get-by-id/{id}": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get admin with children and reports — SuperAdmin view [superadmin]",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
+        responses: {
+          200: { description: "Admin with assigned_children, recent_reports, recent_schedules" },
+          401: { description: "No token provided" },
+          403: { description: "SuperAdmin access required" },
+          404: { description: "Not found" },
+        },
+      },
+    },
+    "/admin/getDashboardStats/{adminId}": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get admin dashboard stats [admin]",
+        parameters: [{ name: "adminId", in: "path", required: true, schema: { type: "integer" } }],
+        responses: {
+          200: { description: "activeChildren, reportsThisMonth, upcomingVisits, learningMaterials" },
+          401: { description: "No token provided" },
+          403: { description: "Admin access required" },
+        },
+      },
+    },
+    "/admin/get-MentorsBy-Country": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get mentors and child counts by country [superadmin]",
+        parameters: [{ name: "country", in: "query", required: true, schema: { type: "string" } }],
+        responses: {
+          200: { description: "totalMentors, totalChildren, mentors array" },
+          401: { description: "No token provided" },
+          403: { description: "SuperAdmin access required" },
+        },
+      },
+    },
+    "/admin/get-by-country": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get admins filtered by country [superadmin]",
+        parameters: [{ name: "country", in: "query", required: false, schema: { type: "string" } }],
+        responses: {
+          200: { description: "List of admins" },
+          401: { description: "No token provided" },
+          403: { description: "SuperAdmin access required" },
+        },
+      },
+    },
+    "/admin/get-Mentor-Activity-count/{country}": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get monthly activity counts for mentors in a country [superadmin]",
+        parameters: [{ name: "country", in: "path", required: true, schema: { type: "string" } }],
+        responses: {
+          200: { description: "Array of { month, activity_count }" },
+          401: { description: "No token provided" },
+          403: { description: "SuperAdmin access required" },
+        },
+      },
+    },
+    "/admin/getAllNotifications": {
+      get: {
+        tags: ["Admin"],
+        summary: "Get all notifications [admin]",
+        responses: {
+          200: { description: "List of notifications" },
+          401: { description: "No token provided" },
+          403: { description: "Admin access required" },
+        },
+      },
+    },
     "/admin/deleteAdminById/{id}": {
       delete: {
         tags: ["Admin"],
-        summary: "Soft-delete admin by ID",
+        summary: "Soft-delete admin by ID [superadmin]",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
         responses: {
           200: { description: "Deleted successfully" },
+          401: { description: "No token provided" },
+          403: { description: "SuperAdmin access required" },
           404: { description: "Not found" },
         },
       },
@@ -715,7 +760,7 @@ const swaggerDefinition = {
     "/child/addChild": {
       post: {
         tags: ["Child"],
-        summary: "Add a new child (supports file upload)",
+        summary: "Add a new child (supports file upload) [admin]",
         requestBody: {
           required: true,
           content: {
@@ -757,7 +802,8 @@ const swaggerDefinition = {
     "/child/login": {
       post: {
         tags: ["Child"],
-        summary: "Child login",
+        summary: "Child login — returns JWT with role: child",
+        security: [],
         requestBody: {
           required: true,
           content: {
@@ -782,7 +828,7 @@ const swaggerDefinition = {
     "/child/allchildren": {
       get: {
         tags: ["Child"],
-        summary: "Get all children (paginated, filterable)",
+        summary: "Get all children (paginated, filterable) [admin]",
         parameters: [
           { name: "page", in: "query", schema: { type: "integer", default: 1 } },
           { name: "limit", in: "query", schema: { type: "integer", default: 20 } },
@@ -907,6 +953,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Child"],
         summary: "Send OTP to child email",
+        security: [],
         requestBody: {
           required: true,
           content: { "application/json": { schema: { type: "object", required: ["email"], properties: { email: { type: "string" } } } } },
@@ -918,6 +965,7 @@ const swaggerDefinition = {
       post: {
         tags: ["Child"],
         summary: "Verify OTP for child",
+        security: [],
         requestBody: {
           required: true,
           content: { "application/json": { schema: { type: "object", required: ["email", "otp"], properties: { email: { type: "string" }, otp: { type: "integer" } } } } },
@@ -928,19 +976,20 @@ const swaggerDefinition = {
     "/child/updatePassword/{id}": {
       put: {
         tags: ["Child"],
-        summary: "Update child password",
+        summary: "Update child password [child]",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
         requestBody: {
           required: true,
           content: { "application/json": { schema: { type: "object", required: ["oldPassword", "newPassword"], properties: { oldPassword: { type: "string" }, newPassword: { type: "string" } } } } },
         },
-        responses: { 200: { description: "Password updated" }, 401: { description: "Wrong current password" } },
+        responses: { 200: { description: "Password updated" }, 401: { description: "No token / wrong current password" }, 403: { description: "Child access required" } },
       },
     },
     "/child/resetPassword": {
       post: {
         tags: ["Child"],
         summary: "Reset child password via email",
+        security: [],
         requestBody: {
           required: true,
           content: { "application/json": { schema: { type: "object", required: ["email", "newPassword"], properties: { email: { type: "string" }, newPassword: { type: "string" } } } } },
@@ -959,17 +1008,17 @@ const swaggerDefinition = {
     "/child/getNotificationsByChild/{childId}": {
       get: {
         tags: ["Child"],
-        summary: "Get notifications for a child",
+        summary: "Get notifications for a child [child]",
         parameters: [{ name: "childId", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { 200: { description: "Notification list" } },
+        responses: { 200: { description: "Notification list" }, 401: { description: "No token provided" }, 403: { description: "Child access required" } },
       },
     },
     "/child/markNotificationAsRead/{id}": {
       put: {
         tags: ["Child"],
-        summary: "Mark a notification as read",
+        summary: "Mark a notification as read [child]",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { 200: { description: "Marked as read" }, 404: { description: "Notification not found" } },
+        responses: { 200: { description: "Marked as read" }, 401: { description: "No token provided" }, 403: { description: "Child access required" }, 404: { description: "Notification not found" } },
       },
     },
 
@@ -979,7 +1028,7 @@ const swaggerDefinition = {
     "/journal/create": {
       post: {
         tags: ["Journal"],
-        summary: "Create a journal entry (supports file upload)",
+        summary: "Create a journal entry (supports file upload) [admin]",
         requestBody: {
           required: true,
           content: {
@@ -1040,7 +1089,7 @@ const swaggerDefinition = {
     "/comment/add": {
       post: {
         tags: ["Comment"],
-        summary: "Create a comment on a journal",
+        summary: "Create a comment on a journal [admin or child]",
         requestBody: {
           required: true,
           content: {
@@ -1100,7 +1149,7 @@ const swaggerDefinition = {
     "/activity/add": {
       post: {
         tags: ["Activity"],
-        summary: "Add a new activity (supports file upload)",
+        summary: "Add a new activity (supports file upload) [admin]",
         requestBody: {
           required: true,
           content: {
@@ -1181,7 +1230,7 @@ const swaggerDefinition = {
     "/tasks/create": {
       post: {
         tags: ["Task"],
-        summary: "Create a new task",
+        summary: "Create a new task [admin]",
         requestBody: {
           required: true,
           content: {
@@ -1261,7 +1310,7 @@ const swaggerDefinition = {
     "/reports/add": {
       post: {
         tags: ["Report"],
-        summary: "Create a new report",
+        summary: "Create a new report [admin]",
         requestBody: {
           required: true,
           content: {
@@ -1375,7 +1424,7 @@ const swaggerDefinition = {
     "/learningmaterials/add": {
       post: {
         tags: ["LearningMaterial"],
-        summary: "Add a learning material (supports file upload)",
+        summary: "Add a learning material (supports file upload) [admin]",
         requestBody: {
           required: true,
           content: {
@@ -1455,7 +1504,7 @@ const swaggerDefinition = {
     "/announcements/add": {
       post: {
         tags: ["Announcement"],
-        summary: "Create an announcement",
+        summary: "Create an announcement [admin]",
         requestBody: {
           required: true,
           content: {
@@ -1536,7 +1585,7 @@ const swaggerDefinition = {
     "/visitPlannings/create": {
       post: {
         tags: ["VisitPlanning"],
-        summary: "Create a visit plan",
+        summary: "Create a visit plan [admin]",
         requestBody: {
           required: true,
           content: {
@@ -1619,7 +1668,7 @@ const swaggerDefinition = {
     "/visitReports/create": {
       post: {
         tags: ["VisitReport"],
-        summary: "Create a visit report",
+        summary: "Create a visit report [admin]",
         requestBody: {
           required: true,
           content: {
@@ -1714,7 +1763,7 @@ const swaggerDefinition = {
     "/management/add": {
       post: {
         tags: ["Management"],
-        summary: "Add a management member",
+        summary: "Add a management member [superadmin]",
         requestBody: {
           required: true,
           content: {
@@ -1740,7 +1789,7 @@ const swaggerDefinition = {
     "/management/getBySuperadmin/{superadminId}": {
       get: {
         tags: ["Management"],
-        summary: "Get management members by superadmin ID",
+        summary: "Get management members by superadmin ID [superadmin]",
         parameters: [{ name: "superadminId", in: "path", required: true, schema: { type: "integer" } }],
         responses: { 200: { description: "Management member list with count" } },
       },
@@ -1748,7 +1797,7 @@ const swaggerDefinition = {
     "/management/delete/{id}": {
       delete: {
         tags: ["Management"],
-        summary: "Soft-delete a management member",
+        summary: "Soft-delete a management member [superadmin]",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
         responses: { 200: { description: "Deleted" }, 404: { description: "Not found" } },
       },

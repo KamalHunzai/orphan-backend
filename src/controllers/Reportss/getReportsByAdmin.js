@@ -8,8 +8,12 @@ const getReportsByAdmin = async (req, res) => {
     if (!adminId || isNaN(Number(adminId))) {
       return res.status(400).json({
         success: false,
-        message: "valid_admin_id_is_required",
+        message: "A valid admin ID is required",
       });
+    }
+
+    if (req.user.id !== Number(adminId)) {
+      return res.status(403).json({ success: false, message: "Access denied" });
     }
 
     const reports = await Report.findAll({
@@ -39,7 +43,7 @@ const getReportsByAdmin = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `reports_fetched_successfully_for_admin_id_${adminId}`,
+      message: "Reports fetched successfully",
       count: reports.length,
       data: reports,
     });
@@ -47,7 +51,7 @@ const getReportsByAdmin = async (req, res) => {
     console.error("get_reports_by_admin_error:", error);
     return res.status(500).json({
       success: false,
-      message: "internal_server_error",
+      message: "Internal server error",
       error: error.message,
     });
   }

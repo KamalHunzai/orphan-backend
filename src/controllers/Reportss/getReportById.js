@@ -8,7 +8,7 @@ const getReportById = async (req, res) => {
     if (!id || isNaN(Number(id))) {
       return res.status(400).json({
         success: false,
-        message: "valid_report_id_is_required",
+        message: "A valid report ID is required",
       });
     }
 
@@ -33,20 +33,20 @@ const getReportById = async (req, res) => {
     if (!report) {
       return res.status(404).json({
         success: false,
-        message: "report_not_found_or_deleted",
+        message: "Report not found",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "report_fetched_successfully",
+      message: "Report fetched successfully",
       data: report,
     });
   } catch (error) {
     console.error("get_report_by_id_error:", error);
     return res.status(500).json({
       success: false,
-      message: "internal_server_error",
+      message: "Internal server error",
       error: error.message,
     });
   }

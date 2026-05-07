@@ -9,7 +9,7 @@ const countChildrenByCountry = async (req, res) => {
     }
 
     const count = await Child.count({
-      where: { location: country }, // ✅ match model column name
+      where: { location: country, is_deleted: false },
     });
 
     res.status(200).json({ country, count });

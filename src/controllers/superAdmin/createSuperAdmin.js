@@ -1,6 +1,6 @@
 "use strict";
 const { SuperAdmin } = require("../../../models");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const Joi = require("joi");
 const sgMail = require("@sendgrid/mail");
 const crypto = require("crypto");
@@ -79,16 +79,7 @@ const createSuperAdmin = async (req, res) => {
       number,
       role,
       password: hashedPassword,
-      profile_picture:
-        "https://dummyimage.com/150x150/cccccc/000000.png&text=Profile",
-      upload: "https://dummyfilestorage.com/default_upload.pdf",
-      otp: 0,
-      otp_expiry: new Date(),
       is_deleted: false,
-      professional_background: "No professional background provided yet.",
-      maximum_case_load: 0,
-      preferred_age_group: "All ages",
-      special_skills: "Not specified",
     });
 
     return res.status(201).json({

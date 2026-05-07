@@ -15,13 +15,13 @@ const getUrgentVisitReports = async (req, res) => {
           model: Child,
           as: "child", // alias must match your association
           where: { location: country }, // corrected property name
-          attributes: ["id", "firstName", "lastName", "location"],
+          attributes: ["id", "first_name", "last_name", "location"],
         },
       ],
       order: [
-        ["visitDate", "DESC"],
-        ["visitTime", "DESC"],
-      ], // sort by latest
+        ["visit_date", "DESC"],
+        ["visit_time", "DESC"],
+      ],
     });
 
     return res.status(200).json({

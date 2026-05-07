@@ -24,9 +24,13 @@ const createVisitPlanning = async (req, res) => {
         .json({ success: false, message: error.details[0].message });
     }
 
-    // Add soft-delete flag (default false)
     const visitPlanning = await VisitPlanning.create({
-      ...value,
+      child_id: value.childId,
+      admin_id: value.adminId,
+      visit_date: value.visitDate,
+      visit_time: value.visitTime,
+      visit_type: value.visitType,
+      notes: value.notes || null,
       is_deleted: false,
     });
 

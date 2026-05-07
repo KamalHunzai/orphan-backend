@@ -8,7 +8,7 @@ const updateChild = async (req, res) => {
     if (!child) {
       return res.status(404).json({
         success: false,
-        message: "child_not_found",
+        message: "Child not found",
       });
     }
 
@@ -43,7 +43,7 @@ const updateChild = async (req, res) => {
       financial_situation:
         req.body.financialSituation ?? child.financial_situation,
       additional_notes: req.body.additionalNotes ?? child.additional_notes,
-      assigned_admin_id: req.body.adminId ?? child.assigned_admin_id,
+      admin_id: req.body.adminId ?? child.admin_id,
       profile_picture,
       uploaded_file,
     };
@@ -70,7 +70,7 @@ const updateChild = async (req, res) => {
       psychologicalSupportNeeds: child.psychological_support_needs,
       financialSituation: child.financial_situation,
       additionalNotes: child.additional_notes,
-      assignedAdminId: child.assigned_admin_id,
+      adminId: child.admin_id,
       profilePicture: child.profile_picture, // S3 URL
       upload: child.uploaded_file, // S3 URL
       createdAt: child.created_at,
@@ -81,14 +81,14 @@ const updateChild = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "child_updated_successfully",
+      message: "Child updated successfully",
       child: cleanChild,
     });
   } catch (error) {
     console.error("update_child_error:", error);
     return res.status(500).json({
       success: false,
-      message: "internal_server_error",
+      message: "Internal server error",
     });
   }
 };

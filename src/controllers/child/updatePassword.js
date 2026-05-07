@@ -1,5 +1,5 @@
 const { Child } = require("../../../models");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const Joi = require("joi");
 
 // Joi validation schema for updating password

@@ -11,7 +11,7 @@ const getAllChildren = async (req, res) => {
     // Filters
     const { country, minAge, maxAge } = req.query;
 
-    const whereClause = {};
+    const whereClause = { is_deleted: false };
 
     // Age filter
     if (minAge || maxAge) {

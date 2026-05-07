@@ -8,7 +8,7 @@ const get_reports_by_child_id = async (req, res) => {
     if (!childId || isNaN(Number(childId))) {
       return res.status(400).json({
         success: false,
-        message: "invalid_child_id_is_required",
+        message: "A valid child ID is required",
       });
     }
 
@@ -64,7 +64,7 @@ const get_reports_by_child_id = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "reports_fetched_successfully",
+      message: "Reports fetched successfully",
       count: response.length,
       data: response,
     });
@@ -72,7 +72,7 @@ const get_reports_by_child_id = async (req, res) => {
     console.error("get_reports_by_child_id_error:", error);
     return res.status(500).json({
       success: false,
-      message: "internal_server_error",
+      message: "Internal server error",
       error: error.message,
     });
   }

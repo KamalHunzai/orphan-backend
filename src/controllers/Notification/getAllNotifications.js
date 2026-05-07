@@ -28,7 +28,7 @@ const getAllNotifications = async (req, res) => {
     if (!notifications || !Array.isArray(notifications)) {
       return res.status(200).json({
         success: true,
-        message: "no_notifications_found",
+        message: "No notifications found",
         count: 0,
         data: [],
       });
@@ -36,7 +36,7 @@ const getAllNotifications = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "notifications_fetched_successfully",
+      message: "Notifications fetched successfully",
       count: notifications.length,
       data: notifications,
     });
@@ -46,7 +46,7 @@ const getAllNotifications = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "internal_server_error",
+      message: "Internal server error",
       error: errMsg,
     });
   }

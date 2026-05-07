@@ -1,5 +1,6 @@
 "use strict";
 
+// Depends on: super_admins
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("managements", {
@@ -29,8 +30,9 @@ module.exports = {
       },
       superadmin_id: {
         type: Sequelize.INTEGER,
+        allowNull: true,
         references: {
-          model: "admins",
+          model: "super_admins",
           key: "id",
         },
         onUpdate: "CASCADE",
@@ -55,6 +57,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable("managements");
+    await queryInterface.dropTable("managements", { cascade: true });
   },
 };

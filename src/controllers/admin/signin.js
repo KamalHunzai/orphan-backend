@@ -29,19 +29,18 @@ const signin = async (req, res) => {
     });
 
     if (!existingAdmin)
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid email or password" });
 
-    // Validate password
     const isPasswordValid = await bcrypt.compare(
       password,
       existingAdmin.password
     );
     if (!isPasswordValid)
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid email or password" });
 
     // Create JWT token
     const token = jwt.sign(
-      { id: existingAdmin.id, email: existingAdmin.email },
+      { id: existingAdmin.id, email: existingAdmin.email, role: "admin" },
       process.env.TOKEN_SECRET,
       { expiresIn: "1d" }
     );

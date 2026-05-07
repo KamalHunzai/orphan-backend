@@ -1,4 +1,3 @@
-const { Op } = require("sequelize");
 const { VisitReport, Admin } = require("../../../models");
 
 const getVisitReportsByChildId = async (req, res) => {
@@ -7,22 +6,22 @@ const getVisitReportsByChildId = async (req, res) => {
   if (!childId) {
     return res.status(400).json({
       success: false,
-      message: "childId is required",
+      message: "Child ID is required",
     });
   }
 
   try {
     const reports = await VisitReport.findAll({
-      where: { childId, is_deleted: false }, // soft-delete aware
+      where: { child_id: childId, is_deleted: false },
       include: [
         {
           model: Admin,
-          attributes: ["id", "fullName", "email", "profilePicture"],
+          attributes: ["id", "full_name", "email", "profile_picture"],
         },
       ],
       order: [
-        ["visitDate", "DESC"],
-        ["visitTime", "DESC"],
+        ["visit_date", "DESC"],
+        ["visit_time", "DESC"],
       ],
     });
 
@@ -34,17 +33,16 @@ const getVisitReportsByChildId = async (req, res) => {
     }
 
     const now = new Date();
-
     const upcomingVisits = [];
     const pastVisits = [];
 
     reports.forEach((report) => {
-      if (!report.visitDate || !report.visitTime) return;
+      if (!report.visit_date || !report.visit_time) return;
 
-      const [hours, minutes] = report.visitTime.split(":").map(Number);
+      const [hours, minutes] = report.visit_time.split(":").map(Number);
       if (isNaN(hours) || isNaN(minutes)) return;
 
-      const visitDateTime = new Date(report.visitDate);
+      const visitDateTime = new Date(report.visit_date);
       if (isNaN(visitDateTime.getTime())) return;
 
       visitDateTime.setHours(hours, minutes, 0, 0);
@@ -56,22 +54,21 @@ const getVisitReportsByChildId = async (req, res) => {
       }
     });
 
-    // Sort upcoming ascending and past descending
     upcomingVisits.sort((a, b) => {
-      const dateA = new Date(a.visitDate);
-      const dateB = new Date(b.visitDate);
-      const [ha, ma] = a.visitTime.split(":").map(Number);
-      const [hb, mb] = b.visitTime.split(":").map(Number);
+      const dateA = new Date(a.visit_date);
+      const dateB = new Date(b.visit_date);
+      const [ha, ma] = a.visit_time.split(":").map(Number);
+      const [hb, mb] = b.visit_time.split(":").map(Number);
       dateA.setHours(ha, ma, 0, 0);
       dateB.setHours(hb, mb, 0, 0);
       return dateA - dateB;
     });
 
     pastVisits.sort((a, b) => {
-      const dateA = new Date(a.visitDate);
-      const dateB = new Date(b.visitDate);
-      const [ha, ma] = a.visitTime.split(":").map(Number);
-      const [hb, mb] = b.visitTime.split(":").map(Number);
+      const dateA = new Date(a.visit_date);
+      const dateB = new Date(b.visit_date);
+      const [ha, ma] = a.visit_time.split(":").map(Number);
+      const [hb, mb] = b.visit_time.split(":").map(Number);
       dateA.setHours(ha, ma, 0, 0);
       dateB.setHours(hb, mb, 0, 0);
       return dateB - dateA;
@@ -82,10 +79,10 @@ const getVisitReportsByChildId = async (req, res) => {
       data: { upcomingVisits, pastVisits },
     });
   } catch (error) {
-    console.error("Error fetching visit reports:", error);
+    console.error("get_visit_reports_by_child_error:", error);
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Internal server error",
     });
   }
 };

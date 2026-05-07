@@ -8,7 +8,7 @@ const get_notifications_by_child = async (req, res) => {
     if (!childId || isNaN(Number(childId))) {
       return res.status(400).json({
         success: false,
-        message: "valid_child_id_is_required",
+        message: "A valid child ID is required",
       });
     }
 
@@ -77,7 +77,7 @@ const get_notifications_by_child = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "notifications_retrieved_successfully",
+      message: "Notifications retrieved successfully",
       count: response.length,
       data: response,
     });
@@ -85,7 +85,7 @@ const get_notifications_by_child = async (req, res) => {
     console.error("get_notifications_by_child_error:", error);
     return res.status(500).json({
       success: false,
-      message: "internal_server_error",
+      message: "Internal server error",
       error: error.message,
     });
   }

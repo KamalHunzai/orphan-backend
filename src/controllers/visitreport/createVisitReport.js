@@ -23,7 +23,7 @@ const create_visit_report = async (req, res) => {
         .status(400)
         .json({
           success: false,
-          message: "validation_error",
+          message: "Validation error",
           errors: error.details.map((e) => e.message),
         });
     }
@@ -41,8 +41,8 @@ const create_visit_report = async (req, res) => {
     });
 
     await Notification.create({
-      title: "new_visit_report",
-      message: `a_new_${value.visitType}_visit_report_has_been_created`,
+      title: "New Visit Report",
+      message: `A new ${value.visitType} visit report has been created`,
       type: "visit_report",
       child_id: visit_report.child_id,
       admin_id: visit_report.admin_id,
@@ -53,7 +53,7 @@ const create_visit_report = async (req, res) => {
       .status(201)
       .json({
         success: true,
-        message: "visit_report_added_successfully",
+        message: "Visit report created successfully",
         data: visit_report,
       });
   } catch (err) {
@@ -62,7 +62,7 @@ const create_visit_report = async (req, res) => {
       .status(500)
       .json({
         success: false,
-        message: "internal_server_error",
+        message: "Internal server error",
         error: err.message,
       });
   }

@@ -70,7 +70,7 @@ module.exports = (sequelize, DataTypes) => {
       superadmin_id: {
         type: DataTypes.INTEGER,
         references: {
-          model: "admins",
+          model: "super_admins",
           key: "id",
         },
         onUpdate: "CASCADE",
@@ -88,6 +88,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       otp_expiry: {
         type: DataTypes.DATE,
+      },
+      role: {
+        type: DataTypes.STRING,
+        defaultValue: "admin",
+        allowNull: false,
       },
       is_deleted: {
         type: DataTypes.BOOLEAN,

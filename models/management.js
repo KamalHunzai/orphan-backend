@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       superadmin_id: {
         type: DataTypes.INTEGER,
         references: {
-          model: "admins",
+          model: "super_admins",
           key: "id",
         },
         onUpdate: "CASCADE",

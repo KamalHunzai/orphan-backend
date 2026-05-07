@@ -1,6 +1,6 @@
 "use strict";
 const { SuperAdmin } = require("../../../models");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const updateSuperAdmin = async (req, res) => {
   const { id } = req.params;

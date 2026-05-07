@@ -6,14 +6,14 @@ const announcementSchema = Joi.object({
   title: Joi.string().required(),
   content: Joi.string().required(),
   priority: Joi.string().required(),
-  superadminId: Joi.number().integer().required(),
-});
+  superadminId: Joi.number().integer().allow(null, ""),
+}).options({ allowUnknown: true });
 
 const addAnnouncement = async (req, res) => {
   try {
-    // Ensure superadminId is integer
-    if (typeof req.body.superadminId === "string") {
-      req.body.superadminId = parseInt(req.body.superadminId, 10);
+    // Normalize superadminId if provided as string
+    if (req.body.superadminId && typeof req.body.superadminId === "string") {
+      req.body.superadminId = parseInt(req.body.superadminId, 10) || null;
     }
 
     // Validate request

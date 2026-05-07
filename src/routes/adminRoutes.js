@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-// Upload (multer-S3 instance)
+const { authenticate, requireAdmin, requireSuperAdmin } = require("../middlewares/auth");
+const { authLimiter, otpLimiter } = require("../middlewares/rateLimiter");
 const upload = require("../middlewares/Upload");
 
 // Controllers
@@ -27,35 +28,25 @@ const resetPassword = require("../controllers/admin/resetPassword");
 
 // ---------------- ROUTES ----------------
 
-// Signup & Login
+// Public
 router.post("/add", signup);
-router.post("/signin", signin);
+router.post("/signin", authLimiter, signin);
+router.post("/sendOtp", otpLimiter, sendOtp);
+router.post("/verifyOtp", authLimiter, verifyOtp);
+router.post("/resetPassword", authLimiter, resetPassword);
 
-// Update Admin (with S3 upload)
-router.put("/update/:id", upload.single("profilePicture"), updateAdmin);
+// Admin protected
+router.put("/update/:id", authenticate, requireAdmin, upload.single("profilePicture"), updateAdmin);
+router.put("/updateAdmin/:id", authenticate, requireAdmin, updateAdminProfile);
+router.get("/getbyid/:id", authenticate, requireAdmin, getAdminById);
+router.get("/getDashboardStats/:adminId", authenticate, requireAdmin, getDashboardStatsByAdmin);
+router.get("/getAllNotifications", authenticate, requireAdmin, getAllNotifications);
 
-// Basic Getters
-router.get("/getbyid/:id", getAdminById);
-router.get("/getDashboardStats/:adminId", getDashboardStatsByAdmin);
-
-// Lists & Filtering
-router.get("/get-MentorsBy-Country", getMentorsByCountry);
-router.get("/get-by-country", getMentorsList);
-router.get("/get-by-id/:id", getAdminsById);
-router.get("/get-Mentor-Activity-count/:country", getMentorActivityByCountry);
-
-// Delete Admin
-router.delete("/deleteAdminById/:id", deleteAdminById);
-
-// Update without file upload
-router.put("/updateAdmin/:id", updateAdminProfile);
-
-// Notifications
-router.get("/getAllNotifications", getAllNotifications);
-
-// OTP / Password Reset
-router.post("/sendOtp", sendOtp);
-router.post("/verifyOtp", verifyOtp);
-router.post("/resetPassword", resetPassword);
+// SuperAdmin protected
+router.get("/get-MentorsBy-Country", authenticate, requireSuperAdmin, getMentorsByCountry);
+router.get("/get-by-country", authenticate, requireSuperAdmin, getMentorsList);
+router.get("/get-by-id/:id", authenticate, requireSuperAdmin, getAdminsById);
+router.get("/get-Mentor-Activity-count/:country", authenticate, requireSuperAdmin, getMentorActivityByCountry);
+router.delete("/deleteAdminById/:id", authenticate, requireSuperAdmin, deleteAdminById);
 
 module.exports = router;

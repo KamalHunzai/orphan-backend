@@ -1,4 +1,9 @@
 require("dotenv").config();
+
+if (!process.env.TOKEN_SECRET) {
+  throw new Error("TOKEN_SECRET environment variable is required");
+}
+
 const express = require("express");
 const http = require("http");
 const Sequelize = require("sequelize");
@@ -9,9 +14,25 @@ const cors = require("cors");
 const morgan = require("morgan");
 const path = require("path");
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+  : [];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 app.use(morgan("dev"));
 
 const swaggerUi = require("swagger-ui-express");
@@ -79,6 +100,10 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
 // Start the server
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

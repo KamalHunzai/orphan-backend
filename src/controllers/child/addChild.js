@@ -63,9 +63,8 @@ const addChild = async (req, res) => {
     const profilePicture = req.files?.profilePicture?.[0]?.location || null;
     const upload = req.files?.upload?.[0]?.location || null;
 
-    // Check existing child (include soft-deleted too)
     const existingChild = await Child.findOne({
-      where: { email },
+      where: { email, is_deleted: false },
     });
 
     if (existingChild) {

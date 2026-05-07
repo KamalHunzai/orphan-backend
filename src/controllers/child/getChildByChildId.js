@@ -76,7 +76,7 @@ const getChildById = async (req, res) => {
     if (!child) {
       return res
         .status(404)
-        .json({ success: false, message: "child_not_found" });
+        .json({ success: false, message: "Child not found" });
     }
 
     // Convert Sequelize instance → plain JS + camelCase
@@ -90,7 +90,7 @@ const getChildById = async (req, res) => {
     console.error("get_child_by_id_error:", error);
     return res.status(500).json({
       success: false,
-      message: "internal_server_error",
+      message: "Internal server error",
     });
   }
 };

@@ -1,5 +1,5 @@
 const { Child } = require("../../../models");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const resetPassword = async (req, res) => {
   try {
@@ -15,8 +15,7 @@ const resetPassword = async (req, res) => {
         });
     }
 
-    // Find child by email
-    const child = await Child.findOne({ where: { email } });
+    const child = await Child.findOne({ where: { email, is_deleted: false } });
     if (!child) {
       return res
         .status(404)

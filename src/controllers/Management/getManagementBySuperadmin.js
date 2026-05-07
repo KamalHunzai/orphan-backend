@@ -15,8 +15,8 @@ const getManagementBySuperadmin = async (req, res) => {
     // Fetch only non-deleted managements
     const managements = await Management.findAll({
       where: {
-        superadminId: Number(superadminId),
-        is_deleted: false, // ✅ respect soft delete
+        superadmin_id: Number(superadminId),
+        is_deleted: false,
       },
       order: [["created_at", "DESC"]], // ✅ underscore style consistent with DB
     });

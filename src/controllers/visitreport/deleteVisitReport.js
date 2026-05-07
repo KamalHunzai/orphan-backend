@@ -9,19 +9,19 @@ const deleteVisitReport = async (req, res) => {
     if (!visitReport) {
       return res
         .status(404)
-        .json({ success: false, message: "visit_report_not_found" });
+        .json({ success: false, message: "Visit report not found" });
     }
 
     await visitReport.update({ is_deleted: true });
 
     return res
       .status(200)
-      .json({ success: true, message: "visit_report_deleted_successfully" });
+      .json({ success: true, message: "Visit report deleted successfully" });
   } catch (err) {
     console.error("delete_visit_report_error:", err);
     return res.status(500).json({
       success: false,
-      message: "internal_server_error",
+      message: "Internal server error",
       error: err.message,
     });
   }

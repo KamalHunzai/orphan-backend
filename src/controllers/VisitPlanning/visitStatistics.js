@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, Op } = require("sequelize");
 const { VisitPlanning } = require("../../../models");
 
 const getVisitStatistics = async (req, res) => {
@@ -10,10 +10,13 @@ const getVisitStatistics = async (req, res) => {
         [Sequelize.fn("date_part", "month", Sequelize.col("visit_date")), "month"],
         [Sequelize.fn("COUNT", Sequelize.col("id")), "count"],
       ],
-      where: Sequelize.where(
-        Sequelize.fn("date_part", "year", Sequelize.col("visit_date")),
-        currentYear
-      ),
+      where: {
+        is_deleted: false,
+        [Op.and]: Sequelize.where(
+          Sequelize.fn("date_part", "year", Sequelize.col("visit_date")),
+          currentYear
+        ),
+      },
       group: [Sequelize.fn("date_part", "month", Sequelize.col("visit_date"))],
       order: [[Sequelize.fn("date_part", "month", Sequelize.col("visit_date")), "ASC"]],
       raw: true,

@@ -1,5 +1,6 @@
 "use strict";
 
+// Depends on: admins, journals
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("comments", {
@@ -57,6 +58,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable("comments");
+    await queryInterface.dropTable("comments", { cascade: true });
   },
 };

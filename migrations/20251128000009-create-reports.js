@@ -1,5 +1,6 @@
 "use strict";
 
+// Depends on: admins, children
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("reports", {
@@ -11,6 +12,7 @@ module.exports = {
       },
       admin_id: {
         type: Sequelize.INTEGER,
+        allowNull: true,
         references: {
           model: "admins",
           key: "id",
@@ -20,6 +22,7 @@ module.exports = {
       },
       child_id: {
         type: Sequelize.INTEGER,
+        allowNull: true,
         references: {
           model: "children",
           key: "id",
@@ -94,6 +97,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable("reports");
+    await queryInterface.dropTable("reports", { cascade: true });
   },
 };

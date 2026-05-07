@@ -1,5 +1,6 @@
 "use strict";
 
+// Depends on: admins
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("children", {
@@ -102,6 +103,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable("children");
+    await queryInterface.dropTable("children", { cascade: true });
   },
 };

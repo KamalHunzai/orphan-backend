@@ -6,13 +6,13 @@ const getTasksByChildId = async (req, res) => {
 
     const tasks = await Task.findAll({
       where: {
-        childId,
-        is_deleted: false, // ✅ Exclude soft-deleted tasks
+        child_id: childId,
+        is_deleted: false,
       },
       order: [
-        ["dueDate", "ASC"],
-        ["dueTime", "ASC"],
-      ], // optional ordering
+        ["due_date", "ASC"],
+        ["due_time", "ASC"],
+      ],
     });
 
     if (tasks.length === 0) {
@@ -25,15 +25,15 @@ const getTasksByChildId = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      message: "Tasks fetched successfully",
       count: tasks.length,
       tasks,
     });
   } catch (error) {
-    console.error("Error fetching tasks by childId:", error);
+    console.error("get_tasks_by_child_error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      details: error.message,
     });
   }
 };

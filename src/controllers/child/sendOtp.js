@@ -20,8 +20,7 @@ const sendOtp = async (req, res) => {
   }
 
   try {
-    // Find child by email
-    const child = await Child.findOne({ where: { email } });
+    const child = await Child.findOne({ where: { email, is_deleted: false } });
     if (!child) {
       return res
         .status(404)
@@ -31,12 +30,11 @@ const sendOtp = async (req, res) => {
         });
     }
 
-    // Generate 4-digit OTP and expiry (10 minutes)
-    const otp = crypto.randomInt(1000, 9999);
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    // Generate 6-digit OTP and expiry (10 minutes)
+    const otp = crypto.randomInt(100000, 999999);
+    const otp_expiry = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Update OTP in database
-    await child.update({ otp, otpExpiry });
+    await child.update({ otp, otp_expiry });
 
     // Prepare and send email via SendGrid
     const msg = {

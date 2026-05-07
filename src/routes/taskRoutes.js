@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const { authenticate, requireAdmin, requireAdminOrSuperAdmin } = require("../middlewares/auth");
+
 const createTask = require("../controllers/task/createTask");
 const getAllTasks = require("../controllers/task/getAllTasks");
 const getTaskById = require("../controllers/task/getTaskById");
@@ -9,12 +11,12 @@ const deleteTask = require("../controllers/task/deleteTask");
 const countTasksByTypeWithCountry = require("../controllers/task/countTasksByTypeWithCountry");
 const getTasksByAdminId = require("../controllers/task/getTasksByAdminId");
 
-router.post("/create", createTask);
-router.get("/alltasks", getAllTasks); // Get all tasks
-router.get("/singletasks/:taskId", getTaskById); // Get task by ID
-router.get("/child/:childId", getTasksByChildId);
-router.delete("/delete/:id", deleteTask);
-router.get("/count-Tasks-ByType", countTasksByTypeWithCountry);
-router.get("/getTasksByAdminId/:adminId", getTasksByAdminId);
+router.post("/create", authenticate, requireAdminOrSuperAdmin, createTask);
+router.get("/alltasks", authenticate, requireAdmin, getAllTasks);
+router.get("/singletasks/:taskId", authenticate, requireAdmin, getTaskById);
+router.get("/child/:childId", authenticate, requireAdmin, getTasksByChildId);
+router.delete("/delete/:id", authenticate, requireAdmin, deleteTask);
+router.get("/count-Tasks-ByType", authenticate, requireAdmin, countTasksByTypeWithCountry);
+router.get("/getTasksByAdminId/:adminId", authenticate, requireAdmin, getTasksByAdminId);
 
 module.exports = router;

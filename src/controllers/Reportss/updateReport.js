@@ -35,7 +35,7 @@ const update_report = async (req, res) => {
     if (error) {
       return res.status(400).json({
         success: false,
-        message: "validation_error",
+        message: "Validation error",
         errors: error.details.map((e) => e.message),
       });
     }
@@ -62,7 +62,7 @@ const update_report = async (req, res) => {
     if (!report) {
       return res
         .status(404)
-        .json({ success: false, message: "report_not_found_or_deleted" });
+        .json({ success: false, message: "Report not found" });
     }
 
     // Map camelCase → snake_case for DB
@@ -96,7 +96,7 @@ const update_report = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "report_updated_successfully",
+      message: "Report updated successfully",
       data: report,
     });
   } catch (error) {
@@ -105,7 +105,7 @@ const update_report = async (req, res) => {
       .status(500)
       .json({
         success: false,
-        message: "internal_server_error",
+        message: "Internal server error",
         error: error.message,
       });
   }

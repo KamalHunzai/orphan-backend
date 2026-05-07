@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const { authenticate, requireAdmin, requireAdminOrSuperAdmin } = require("../middlewares/auth");
+
 const createVisitReport = require("../controllers/visitreport/createVisitReport");
 const getAllVisitReports = require("../controllers/visitreport/getAllVisitRoports");
 const getVisitReportById = require("../controllers/visitreport/getSingleVisitReport");
@@ -11,14 +13,14 @@ const getUrgentVisitReports = require("../controllers/visitreport/getUrgentVisit
 const getVisitReportsByChildId = require("../controllers/visitreport/getVisitReportByChildId.js");
 const deleteVisitReport = require("../controllers/visitreport/deleteVisitReport.js");
 
-router.post("/create", createVisitReport);
-router.get("/getall", getAllVisitReports);
-router.get("/single/:id", getVisitReportById);
-router.get("/child/:childId", getVisitReportByChildId);
-router.get("/getLatestVisit/:childId", getLatestVisitReportsByChild);
-router.get("/getByAdminId/:adminId", getVisitReportsByAdminId);
-router.get("/getUrgentVisitReports", getUrgentVisitReports);
-router.get("/getVisitReportsByChildId/:childId", getVisitReportsByChildId);
-router.delete("/delete/:id", deleteVisitReport);
+router.post("/create", authenticate, requireAdmin, createVisitReport);
+router.get("/getall", authenticate, requireAdmin, getAllVisitReports);
+router.get("/single/:id", authenticate, requireAdmin, getVisitReportById);
+router.get("/child/:childId", authenticate, requireAdmin, getVisitReportByChildId);
+router.get("/getLatestVisit/:childId", authenticate, requireAdmin, getLatestVisitReportsByChild);
+router.get("/getByAdminId/:adminId", authenticate, requireAdmin, getVisitReportsByAdminId);
+router.get("/getUrgentVisitReports", authenticate, requireAdminOrSuperAdmin, getUrgentVisitReports);
+router.get("/getVisitReportsByChildId/:childId", authenticate, requireAdmin, getVisitReportsByChildId);
+router.delete("/delete/:id", authenticate, requireAdmin, deleteVisitReport);
 
 module.exports = router;

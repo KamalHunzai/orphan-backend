@@ -13,6 +13,10 @@ const getDashboardStatsByAdmin = async (req, res) => {
       return res.status(400).json({ error: "Invalid adminId" });
     }
 
+    if (req.user.id !== adminId) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
     const today = new Date();
     const startOfToday = new Date(today.setHours(0, 0, 0, 0));
     const endOfToday = new Date(today.setHours(23, 59, 59, 999));

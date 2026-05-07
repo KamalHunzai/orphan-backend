@@ -30,6 +30,7 @@ erDiagram
         int superadmin_id FK
         string password
         string profile_picture
+        string role
         int otp
         timestamp otp_expiry
         boolean is_deleted

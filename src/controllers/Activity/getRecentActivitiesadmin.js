@@ -7,7 +7,7 @@ const getRecentActivities = async (req, res) => {
     if (!adminId) {
       return res
         .status(400)
-        .json({ success: false, message: "admin_id is required." });
+        .json({ success: false, message: "Admin ID is required" });
     }
 
     // Fetch recent activities for the given adminId, excluding soft-deleted

@@ -7,6 +7,10 @@ const updateAdmin = async (req, res) => {
 
   try {
     // ✅ Exclude soft-deleted admins
+    if (req.user.id !== Number(id)) {
+      return res.status(403).json({ message: "You do not have permission to update this profile" });
+    }
+
     const adminInstance = await Admin.findOne({
       where: { id, is_deleted: false },
     });

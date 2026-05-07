@@ -1,79 +1,45 @@
 const jwt = require("jsonwebtoken");
-const { Admin } = require("../../models");
 
-const authenticateUser = async (req, res, next) => {
-  try {
-    const accessToken = req.header("accessToken");
-
-    if (!accessToken) {
-      return res
-        .status(401)
-        .send({ message: "Authentication Invalid: No token provided" });
-    }
-
-    const decoded = jwt.verify(accessToken, process.env.TOKEN_SECRET);
-
-    if (!decoded.user) {
-      return res
-        .status(401)
-        .send({ message: "Authentication Invalid: No user in token" });
-    }
-
-    req.user = { id: decoded.user.id };
-
-    // Fetch the user's role from the database
-    const user = await Admin.findByPk(req.user.id, { attributes: ["role"] });
-
-    if (!user) {
-      return res.status(404).send({ message: "User not found" });
-    }
-
-    req.user.role = user.role;
-    next();
-  } catch (error) {
-    console.error("Error authenticating user:", error);
-    return res.status(500).send({ message: "Internal Server Error" });
+const authenticate = (req, res, next) => {
+  const accessToken = req.header("accessToken");
+  if (!accessToken) {
+    return res.status(401).json({ message: "No token provided. Please login first." });
   }
-};
-
-const authenticate = async (req, res, next) => {
   try {
-    let accessToken = req.header("accessToken");
-
-    // Check if token exists
-    if (!accessToken) {
-      return res.status(403).send({
-        success: false,
-        msg: "Please login first!",
-      });
-    }
-
-    // Verify the access token
-    const isValidAccessToken = jwt.verify(
-      accessToken,
-      process.env.TOKEN_SECRET
-    );
-
-    if (!isValidAccessToken) {
-      return res.status(403).send({
-        success: false,
-        message: "Invalid access token",
-      });
-    }
-
-    req.user = {
-      user: isValidAccessToken.user, // assuming 'user' is part of the token payload
-      role: isValidAccessToken.role,
-    };
-
-    // Proceed to the next middleware
+    const decoded = jwt.verify(accessToken, process.env.TOKEN_SECRET);
+    req.user = { id: decoded.id, email: decoded.email, role: decoded.role };
     next();
   } catch (err) {
-    return res.status(500).send({
-      success: false,
-      msg: err.message, // Improved error message handling
-    });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
-/////
-module.exports = { authenticate, authenticateUser };
+
+const requireAdmin = (req, res, next) => {
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({ message: "Admin access required" });
+  }
+  next();
+};
+
+const requireSuperAdmin = (req, res, next) => {
+  if (req.user?.role !== "superadmin") {
+    return res.status(403).json({ message: "SuperAdmin access required" });
+  }
+  next();
+};
+
+const requireChild = (req, res, next) => {
+  if (req.user?.role !== "child") {
+    return res.status(403).json({ message: "Child access required" });
+  }
+  next();
+};
+
+const requireAdminOrSuperAdmin = (req, res, next) => {
+  if (!["admin", "superadmin"].includes(req.user?.role)) {
+    return res.status(403).json({ message: "Admin or SuperAdmin access required" });
+  }
+  next();
+};
+
+module.exports = { authenticate, requireAdmin, requireSuperAdmin, requireChild, requireAdminOrSuperAdmin };

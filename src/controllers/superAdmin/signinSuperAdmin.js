@@ -1,6 +1,6 @@
 "use strict";
 const { SuperAdmin } = require("../../../models");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 require("dotenv").config();
@@ -28,8 +28,8 @@ const signinSuperAdmin = async (req, res) => {
 
     if (!superAdmin) {
       return res
-        .status(404)
-        .json({ success: false, message: "SuperAdmin not found" });
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     // ✅ Compare password using bcrypt
@@ -42,7 +42,7 @@ const signinSuperAdmin = async (req, res) => {
 
     // ✅ Generate JWT token
     const token = jwt.sign(
-      { id: superAdmin.id, email: superAdmin.email, role: superAdmin.role },
+      { id: superAdmin.id, email: superAdmin.email, role: "superadmin" },
       process.env.TOKEN_SECRET,
       { expiresIn: "7d" }
     );

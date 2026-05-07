@@ -8,41 +8,39 @@ const getDashboardCounts = async (req, res) => {
     if (!country) {
       return res.status(400).json({
         success: false,
-        message: "Country is required.",
+        message: "Country is required",
       });
     }
 
-    // Total children in the given country
     const totalChildren = await Child.count({
-      where: { location: country }, // Use 'location' if that stores country
+      where: { location: country, is_deleted: false },
     });
 
-    // Total visit reports for children in the country
     const totalReports = await VisitReport.count({
-      include: [
-        {
-          model: Child,
-          as: "child", // Make sure alias matches your Sequelize association
-          where: { location: country },
-        },
-      ],
-    });
-
-    // Upcoming visit schedules (future dates)
-    const upcomingSchedules = await VisitPlanning.count({
-      where: {
-        visitDate: { [Op.gt]: new Date() }, // Future visits
-      },
-    });
-
-    // Urgent cases (VisitReports with status "urgent") filtered by country
-    const urgentCases = await VisitReport.count({
-      where: { status: "urgent" },
+      where: { is_deleted: false },
       include: [
         {
           model: Child,
           as: "child",
-          where: { location: country },
+          where: { location: country, is_deleted: false },
+        },
+      ],
+    });
+
+    const upcomingSchedules = await VisitPlanning.count({
+      where: {
+        visit_date: { [Op.gt]: new Date() },
+        is_deleted: false,
+      },
+    });
+
+    const urgentCases = await VisitReport.count({
+      where: { status: "urgent", is_deleted: false },
+      include: [
+        {
+          model: Child,
+          as: "child",
+          where: { location: country, is_deleted: false },
         },
       ],
     });
@@ -58,11 +56,10 @@ const getDashboardCounts = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching dashboard data:", error);
+    console.error("get_dashboard_counts_error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message,
     });
   }
 };

@@ -1,5 +1,6 @@
 "use strict";
 
+// No foreign keys — must be created first
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("super_admins", {
@@ -50,6 +51,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable("super_admins");
+    await queryInterface.dropTable("super_admins", { cascade: true });
   },
 };

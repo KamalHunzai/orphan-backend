@@ -1,8 +1,38 @@
 "use strict";
+const Joi = require("joi");
 const { Journal } = require("../../../models");
+
+const journalSchema = Joi.object({
+  title: Joi.string().min(1).required(),
+  journalText: Joi.string().min(1).required(),
+  childId: Joi.number().integer().required(),
+  moodRating: Joi.number().integer().min(1).max(10).allow(null, ""),
+  emotionTags: Joi.alternatives().try(Joi.array(), Joi.string()).allow(null, ""),
+  socialInteraction: Joi.string().allow(null, ""),
+  assessmentType: Joi.string().allow(null, ""),
+  notes: Joi.string().allow(null, ""),
+  activities: Joi.alternatives().try(Joi.array(), Joi.string()).allow(null, ""),
+}).options({ allowUnknown: true });
 
 const createJournal = async (req, res) => {
   try {
+    const bodyToValidate = {
+      title: req.body.title || req.body.tittle,
+      journalText: req.body.journalText || req.body.journal_text,
+      childId: req.body.childId || req.body.child_id,
+      moodRating: req.body.moodRating || req.body.mood_rating,
+      emotionTags: req.body.emotionTags || req.body.emotion_tags,
+      socialInteraction: req.body.socialInteraction || req.body.social_interaction,
+      assessmentType: req.body.assessmentType || req.body.assessment_type,
+      notes: req.body.notes,
+      activities: req.body.activities,
+    };
+
+    const { error } = journalSchema.validate(bodyToValidate);
+    if (error) {
+      return res.status(400).json({ success: false, message: error.details[0].message });
+    }
+
     const data = {
       ...req.body,
       mood_rating: req.body.moodRating ? parseInt(req.body.moodRating) : null,

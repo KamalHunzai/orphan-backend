@@ -1,5 +1,7 @@
 "use strict";
 
+// Depends on: super_admins
+// NOTE: role column is NOT included here — added by migration 20251128000015
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("admins", {
@@ -45,7 +47,7 @@ module.exports = {
       superadmin_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: "admins",
+          model: "super_admins",
           key: "id",
         },
         onUpdate: "CASCADE",
@@ -83,6 +85,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable("admins");
+    await queryInterface.dropTable("admins", { cascade: true });
   },
 };

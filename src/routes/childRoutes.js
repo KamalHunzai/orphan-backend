@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
+const { authenticate, requireAdmin, requireChild, requireAdminOrSuperAdmin } = require("../middlewares/auth");
+const { authLimiter, otpLimiter } = require("../middlewares/rateLimiter");
+
 // Controllers
 const addChild = require("../controllers/child/addChild");
 const loginChild = require("../controllers/child/loginChild");
@@ -32,58 +35,44 @@ const upload = require("../middlewares/Upload");
 
 // ------------------- ROUTES -------------------
 
-// Add Child (with S3 file upload)
+// Public
+router.post("/login", authLimiter, loginChild);
+router.post("/sendOtp", otpLimiter, sendOtp);
+router.post("/verifyOtp", authLimiter, verifyOtp);
+router.post("/resetPassword", authLimiter, resetPassword);
+
+// Admin only
 router.post(
   "/addChild",
-  upload.fields([
-    { name: "profilePicture", maxCount: 1 },
-    { name: "upload", maxCount: 1 },
-  ]),
+  authenticate, requireAdmin,
+  upload.fields([{ name: "profilePicture", maxCount: 1 }, { name: "upload", maxCount: 1 }]),
   addChild
 );
-
-// Login
-router.post("/login", loginChild);
-
-// Get children
-router.get("/allchildren", getAllChildren);
-router.get("/getbyid/:id", getChildById);
-
-// Update Child (also supports S3 upload)
+router.get("/allchildren", authenticate, requireAdmin, getAllChildren);
 router.put(
   "/updateChild/:id",
-  upload.fields([
-    { name: "profilePicture", maxCount: 1 },
-    { name: "upload", maxCount: 1 },
-  ]),
+  authenticate, requireAdmin,
+  upload.fields([{ name: "profilePicture", maxCount: 1 }, { name: "upload", maxCount: 1 }]),
   updateChild
 );
+router.get("/getChildrenByAdminId/:adminId", authenticate, requireAdmin, getChildrenByAdminId);
+router.delete("/deleteChild/:id", authenticate, requireAdmin, deleteChild);
 
-// Admin-related
-router.get("/getAdminByChildId/:childId", getAdminByChildId);
-router.get("/getChildrenByAdminId/:adminId", getChildrenByAdminId);
+// Admin or SuperAdmin
+router.get("/age-distribution", authenticate, requireAdminOrSuperAdmin, getAgeDistribution);
+router.get("/countChildrenByCountry", authenticate, requireAdminOrSuperAdmin, countChildrenByCountry);
+router.get("/getDashboardCounts", authenticate, requireAdminOrSuperAdmin, getDashboardCounts);
+router.get("/getChildrenByCountry", authenticate, requireAdminOrSuperAdmin, getChildrenByCountry);
+router.get("/get-Age-Group", authenticate, requireAdminOrSuperAdmin, getAgeGroupDistribution);
 
-// Statistics
-router.get("/age-distribution", getAgeDistribution);
-router.get("/countChildrenByCountry", countChildrenByCountry);
-router.get("/getDashboardCounts", getDashboardCounts);
-router.get("/getChildrenByCountry", getChildrenByCountry);
-router.get("/get-Age-Group", getAgeGroupDistribution);
+// Admin or Child
+router.get("/getbyid/:id", authenticate, getChildById);
+router.get("/getAdminByChildId/:childId", authenticate, getAdminByChildId);
+router.get("/getReportByChildId/:childId", authenticate, getReportByChildId);
 
-// Delete
-router.delete("/deleteChild/:id", deleteChild);
-
-// Reports
-router.get("/getReportByChildId/:childId", getReportByChildId);
-
-// Notifications
-router.get("/getNotificationsByChild/:childId", getNotificationsByChild);
-router.put("/markNotificationAsRead/:id", markNotificationAsRead);
-
-// OTP / Password
-router.post("/verifyOtp", verifyOtp);
-router.post("/sendOtp", sendOtp);
-router.put("/updatePassword/:id", updatePassword);
-router.post("/resetPassword", resetPassword);
+// Child only
+router.get("/getNotificationsByChild/:childId", authenticate, requireChild, getNotificationsByChild);
+router.put("/markNotificationAsRead/:id", authenticate, requireChild, markNotificationAsRead);
+router.put("/updatePassword/:id", authenticate, requireChild, updatePassword);
 
 module.exports = router;
