@@ -68,8 +68,6 @@ app.use("/reports", reportsRoutes);
 app.use("/management", managementRoutes);
 app.use("/comment", commentRoutes);
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
 app.use(express.static(path.join(__dirname, "public")));
 // 🚫 Disable caching globally
 app.use((req, res, next) => {
