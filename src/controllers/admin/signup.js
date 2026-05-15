@@ -60,14 +60,6 @@ const signup = async (req, res) => {
     const password = generatePassword();
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Send email
-    const emailSent = await sendEmail(email, fullName || email, password);
-    if (!emailSent) {
-      return res
-        .status(500)
-        .json({ message: "Email sending failed. Mentor not registered." });
-    }
-
     // Normalize name
     const normalizedName = fullName
       ? fullName
@@ -79,7 +71,7 @@ const signup = async (req, res) => {
           Math.floor(Math.random() * 3)
         ];
 
-    // Create mentor entry
+    // Create mentor entry first so a failed email doesn't lose the record
     const newMentor = await Admin.create({
       full_name: normalizedName,
       email,
@@ -122,6 +114,16 @@ const signup = async (req, res) => {
       is_deleted: false,
     });
 
+    // Send credentials email — non-blocking: mentor already created above
+    let emailWarning = null;
+    try {
+      const emailSent = await sendEmail(email, normalizedName, password);
+      if (!emailSent) emailWarning = "Email delivery failed. Share credentials manually.";
+    } catch (emailErr) {
+      console.error("Email error (mentor still created):", emailErr.message);
+      emailWarning = "Email delivery failed. Share credentials manually.";
+    }
+
     // JWT token
     const token = jwt.sign(
       { id: newMentor.id, email: newMentor.email },
@@ -130,7 +132,9 @@ const signup = async (req, res) => {
     );
 
     return res.status(201).json({
-      message: "Mentor registered successfully. Credentials sent by email.",
+      message: emailWarning
+        ? `Mentor registered successfully. ${emailWarning}`
+        : "Mentor registered successfully. Credentials sent by email.",
       token,
       admin: {
         id: newMentor.id,
